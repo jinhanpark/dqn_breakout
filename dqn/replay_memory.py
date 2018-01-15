@@ -3,6 +3,7 @@ import numpy as np
 
 class ReplayMemory:
   def __init__(self, config):
+    self.save_dir = config.mem_dir
 
     self.memory_size = config.memory_size
 
@@ -67,4 +68,21 @@ class ReplayMemory:
     self.current = self.counts[1]
 
   def save(self):
-    for name, array in zip([""])
+    for name, array in\
+        zip(["actions", "rewards", "screens", "terminals", "counts"],
+            [self.actions, self.rewards, self.screens, self.terminals, self.counts]):
+      save_npy(array, os.path.join(self.save_dir, name))
+
+  def load(self):
+    for name, array in\
+        zip(["actions", "rewards", "screens", "terminals", "counts"],
+            [self.actions, self.rewards, self.screens, self.terminals, self.counts]):
+      array = load_npy(os.path.join(self.save_dir, name))
+
+def save_npy(obj, path):
+  np.save(path, obj)
+  print("save {}".format(path))
+
+def load_npy(path):
+  obj = np.load(path)
+  print("load {}".format(path))
