@@ -5,6 +5,7 @@ class MemoryConfig:
   memory_size = 10 * mahn
 
 class ModelConfig:
+  model_name = "DQN"
   in_height = 84
   in_width = in_height
 
@@ -33,12 +34,19 @@ class TrainConfig:
   fixed_net_update_frequency = mahn
 
   replay_frequency = 4
+  action_repeat = 4
+
+  no_op_max = 30
   
   df = 0.99
-  lr = 0.001
+  lr = 0.00025
+  lr_min = 0.00025
+  lr_decay = 0.96
+  lr_decay_step = 5 * mahn
 
   save_step = 10 * mahn
   summarize_step = 5 * mahn
+  load_model = True
   
 class Config(MemoryConfig, ModelConfig, EnvironmentConfig, TrainConfig):
   load_ckpt = True

@@ -81,8 +81,8 @@ class ReplayMemory:
 
 def save_npy(obj, path):
   np.save(path, obj)
-  print("****save {}".format(path))
+  print("****memory saved: {}".format(path))
 
 def load_npy(path):
   obj = np.load(path)
-  print("****load {}".format(path))
+  print("****memory loaded: {}".format(path))
