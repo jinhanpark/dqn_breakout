@@ -1,3 +1,5 @@
+import gym
+
 class Environment:
   def __init__(self, config):
     self.env = gym.make(config.env_name)

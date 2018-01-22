@@ -2,15 +2,17 @@ import os
 
 import tensorflow as tf
 
+from .utils import clipped_error
+
 class BaseModel:
   def __init__(self, config):
     self.config = config
-    self.saver = tf.train.Saver()
+    self.saver = None
 
-  def save(self):
+  def save(self, step=None):
     model_name = self.config.model_name
     ckpt_dir = os.path.join(self.config.ckpt_dir, model_name)
-    self.saver.save(self.sess, ckpt_dir, global_step=self.sess.run(self.global_step))
+    self.saver.save(self.sess, ckpt_dir, global_step=step)
     print("****weights saved")
 
   def _load(self):
@@ -32,9 +34,12 @@ class DQN(BaseModel):
     super(DQN, self).__init__(config)
 
   def _build_model(self):
-    self.S_in = tf.placeholder(tf.float32, (None, self.config.in_height, self.config.input_width, self.config.history_length), name="state")
-    self.Q = self._q_net_cnn("train")
-    self.fixed_Q = self._q_net_cnn("fixed")
+    with tf.variable_scope("train"):
+      self.S_in = tf.placeholder(tf.float32, (None, self.config.in_height, self.config.in_width, self.config.history_length), name="state")
+      self.Q = self._q_net_cnn(self.S_in)
+    with tf.variable_scope("fixed"):
+      self.fixed_S_in = tf.placeholder(tf.float32, (None, self.config.in_height, self.config.in_width, self.config.history_length), name="state")
+      self.fixed_Q = self._q_net_cnn(self.fixed_S_in)
     self.train_vars = tf.get_collection(
       tf.GraphKeys.TRAINABLE_VARIABLES, scope="train")
     self.fixed_vars = tf.get_collection(
@@ -42,41 +47,42 @@ class DQN(BaseModel):
 
     self.loss, self.train_op = self._loss_and_train_op()
     self.copy_ops = self._var_copy_ops()
-
+    self.writer = tf.summary.FileWriter(self.config.log_dir, self.sess.graph)
+    self.saver = tf.train.Saver()
     self.sess.run(tf.global_variables_initializer())
+    print("****main graph builded")
 
   def initialize_variables_and_copy_network(self):
     self.sess.run(tf.global_variables_initializer())
     self.update_fixed_target()
 
-  def _q_net_cnn(self, scope):
+  def _q_net_cnn(self, state_in):
     initializer = tf.truncated_normal_initializer(0, 0.02)
     activation_fn = tf.nn.relu
 
-    h = self.S_in
-    with tf.variable_scope(scope):
-      for i, (num_filters, kernel_size, stride) in enumerate(self.config.cnn_archi):
-        h = tf.layers.conv2d(
-          inputs=mid,
-          filters=num_filters,
-          kernel_size=kernel_size,
-          strides=stride,
-          activation=activation_fn,
-          kernel_initializer=initializer,
-          name="conv{}".format(i + 1))
-      h = tf.layers.flatten(h)
-      for i, dim in enumerate(self.config.fc_archi):
-        h = tf.layers.dense(
-          inputs=mid,
-          units=dim,
-          activation=activation_fn,
-          kernel_initializer=initializer
-          name="fc{}".format(i + 1))
-      Q = tf.layers.dense(
+    h = state_in
+    for i, (num_filters, kernel_size, stride) in enumerate(self.config.cnn_archi):
+      h = tf.layers.conv2d(
         inputs=h,
-        units=self.config.action_space_size,
-        kernel_initializer=initializer
-        name="Q")
+        filters=num_filters,
+        kernel_size=kernel_size,
+        strides=stride,
+        activation=activation_fn,
+        kernel_initializer=initializer,
+        name="conv{}".format(i + 1))
+    h = tf.layers.flatten(h)
+    for i, dim in enumerate(self.config.fc_archi):
+      h = tf.layers.dense(
+        inputs=h,
+        units=dim,
+        activation=activation_fn,
+        kernel_initializer=initializer,
+        name="fc{}".format(i + 1))
+    Q = tf.layers.dense(
+      inputs=h,
+      units=self.config.action_space_size,
+      kernel_initializer=initializer,
+      name="Q")
     return Q
 
   def _loss_and_train_op(self):
@@ -87,7 +93,7 @@ class DQN(BaseModel):
       Q_batch = tf.reduce_sum(tf.multiply(a_one_hot, self.Q), axis=1, name="q_batch")
       error = self.target - Q_batch
       loss = tf.reduce_mean(clipped_error(error), name="loss")
-      slef.lr_step = tf.placeholder(tf.int64, None, name="lr_step")
+      self.lr_step = tf.placeholder(tf.int64, None, name="lr_step")
       self.decayed_lr = tf.maximum(
         self.config.lr_min,
         tf.train.exponential_decay(
@@ -110,7 +116,7 @@ class DQN(BaseModel):
 
   def update_fixed_target(self):
     self.sess.run(self.copy_ops)
-    print("fixed target updated")
+    print("****fixed target updated")
 
   def load(self):
     rt = self._load()
