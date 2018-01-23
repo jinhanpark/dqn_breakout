@@ -111,7 +111,6 @@ class Agent(DQN):
           if max_avg_record * 0.9 <= avg_ep_reward:
             self.global_step.assign(self.step + 1)
             self.save(self.step)
-            self.memory.save()
             max_avg_record = max(max_avg_record, avg_ep_reward)
 
           summary_dict = {"average.reward": avg_reward,

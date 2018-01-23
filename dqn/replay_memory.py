@@ -12,7 +12,7 @@ class ReplayMemory:
     self.screens = np.empty((self.memory_size, config.in_height, config.in_width), dtype = np.float16)
     self.rewards = np.empty(self.memory_size, dtype = np.integer)
     self.dones = np.empty(self.memory_size, dtype = np.bool)
-    self.counts = np.empty(2, dtype = int)
+    self.counts = np.empty(2, dtype = np.int32)
 
     self.history_length = config.history_length
     self.shape = (config.in_height, config.in_width)
@@ -65,8 +65,10 @@ class ReplayMemory:
   def _store_counts(self):
     self.counts[0] = self.count
     self.counts[1] = self.current
+    print(self.counts)
 
   def _restore_counts(self):
+    print(self.counts)
     self.count = self.counts[0]
     self.current = self.counts[1]
 
@@ -79,7 +81,7 @@ class ReplayMemory:
 
   def load(self):
     for name, array in\
-        zip(["actions", "rewards", "screens", "dones", "counts"],
+        zip(["actions.npy", "rewards.npy", "screens.npy", "dones.npy", "counts.npy"],
             [self.actions, self.rewards, self.screens, self.dones, self.counts]):
       array = load_npy(os.path.join(self.save_dir, name))
     self._restore_counts()
@@ -91,3 +93,4 @@ def save_npy(obj, path):
 def load_npy(path):
   obj = np.load(path)
   print("****memory loaded: {}".format(path))
+  return obj
