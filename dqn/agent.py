@@ -106,7 +106,7 @@ class Agent(DQN):
             max_ep_reward = 0
             avg_ep_reward = 0
 
-          print("\navg_r: {0:.4f}, avg_l: {0:.6f}, avg_q: {0:3.6f}, avg_ep_r: {0:.4f}, max_ep_r: {0:.4f}".format(avg_reward, avg_loss, avg_q, avg_ep_reward, max_ep_reward))
+          print("\navg_r: {:.4f}, avg_l: {:.6f}, avg_q: {:3.6f}, avg_ep_r: {:.4f}, max_ep_r: {:.4f}".format(avg_reward, avg_loss, avg_q, avg_ep_reward, max_ep_reward))
 
           if max_avg_record * 0.9 <= avg_ep_reward:
             self.global_step.assign(self.step + 1)
