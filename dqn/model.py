@@ -9,7 +9,7 @@ class BaseModel:
     self.config = config
     self.saver = None
 
-  def save(self, step=None):
+  def _save(self, step=None):
     model_name = self.config.model_name
     ckpt_dir = os.path.join(self.config.ckpt_dir, model_name)
     self.saver.save(self.sess, ckpt_dir, global_step=step)
@@ -119,8 +119,13 @@ class DQN(BaseModel):
     self.sess.run(self.copy_ops)
     print("\n****fixed target updated")
 
+  def save(self, step):
+    self._save(step)
+    self.memory.save()
+
   def load(self):
     rt = self._load()
     if rt:
       self.update_fixed_target()
+      self.memory.load()
     return rt

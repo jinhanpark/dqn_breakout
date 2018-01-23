@@ -1,3 +1,4 @@
+import os
 import random
 import numpy as np
 
@@ -72,14 +73,14 @@ class ReplayMemory:
   def save(self):
     self._store_counts()
     for name, array in\
-        zip(["actions", "rewards", "screens", "terminals", "counts"],
-            [self.actions, self.rewards, self.screens, self.terminals, self.counts]):
+        zip(["actions", "rewards", "screens", "dones", "counts"],
+            [self.actions, self.rewards, self.screens, self.dones, self.counts]):
       save_npy(array, os.path.join(self.save_dir, name))
 
   def load(self):
     for name, array in\
-        zip(["actions", "rewards", "screens", "terminals", "counts"],
-            [self.actions, self.rewards, self.screens, self.terminals, self.counts]):
+        zip(["actions", "rewards", "screens", "dones", "counts"],
+            [self.actions, self.rewards, self.screens, self.dones, self.counts]):
       array = load_npy(os.path.join(self.save_dir, name))
     self._restore_counts()
 

@@ -111,6 +111,7 @@ class Agent(DQN):
           if max_avg_record * 0.9 <= avg_ep_reward:
             self.global_step.assign(self.step + 1)
             self.save(self.step)
+            self.memory.save()
             max_avg_record = max(max_avg_record, avg_ep_reward)
 
           summary_dict = {"average.reward": avg_reward,
@@ -121,13 +122,13 @@ class Agent(DQN):
                           "training.learning_rate": self.sess.run(self.decayed_lr,
                                                                   {self.lr_step: self.step})}
           self.summarize(summary_dict, self.step)
-        self.update_cnt = 0
-        ep_reward = 0.
-        total_reward = 0.
-        ep_rewards = []
-        max_avg_record = 0.
-        self.total_loss = 0.
-        self.total_q = 0.
+          self.update_cnt = 0
+          ep_reward = 0.
+          total_reward = 0.
+          ep_rewards = []
+          max_avg_record = 0.
+          self.total_loss = 0.
+          self.total_q = 0.
         
 
   def get_eps(self):
