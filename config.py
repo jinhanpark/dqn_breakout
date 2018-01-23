@@ -22,7 +22,6 @@ class ModelConfig:
 
 class EnvironmentConfig:
   env_name = "BreakoutDeterministic-v4"
-  action_space_size = 3
 
   max_reward = 1.
   min_reward = -1.
@@ -30,7 +29,11 @@ class EnvironmentConfig:
 class TrainConfig:
   max_step = 500 * mahn
 
-  initial_exploration = 5 * mahn
+  initial_exploration = 1.
+  final_exploration = 0.1
+  final_exploration_step = 100 * mahn
+  
+  replay_start_size = 5 * mahn
   fixed_net_update_frequency = mahn
 
   replay_frequency = 4
@@ -39,6 +42,7 @@ class TrainConfig:
   no_op_max = 30
   
   df = 0.99
+
   lr = 0.00025
   lr_min = 0.00025
   lr_decay = 0.96
@@ -51,4 +55,4 @@ class TrainConfig:
 class Config(MemoryConfig, ModelConfig, EnvironmentConfig, TrainConfig):
   load_ckpt = True
   train = True
-  render = 1
+  render = 0

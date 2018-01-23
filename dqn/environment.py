@@ -1,5 +1,11 @@
 import gym
 
+import cv2
+
+from .utils import rgb2gray
+
+import random
+
 class Environment:
   def __init__(self, config):
     self.env = gym.make(config.env_name)
@@ -29,7 +35,7 @@ class Environment:
     return self.screen, 0, 0, self.done
 
   def _step(self, action):
-    self._screen, self.reward, self.done, self.step_info = self.env.step(action)
+    self._screen, self.reward, self.done, self.info = self.env.step(action)
 
   def _random_step(self):
     action = self.env.action_space.sample()
@@ -37,18 +43,18 @@ class Environment:
 
   @property
   def screen(self):
-    return imresize(rgb2gray(self._screen)/255., self.dims)
+    return cv2.resize(rgb2gray(self._screen)/255., self.in_shape)
 
   @property
-  def action_size(self):
+  def action_space_size(self):
     return self.env.action_space.n
 
   @property
   def lives(self):
-    if self.step_info is None:
+    if self.info is None:
       return 0
     else:
-      return self.step_info["ale.lives"]
+      return self.info["ale.lives"]
 
   def render(self):
     if self.rendering:

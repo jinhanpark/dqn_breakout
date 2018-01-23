@@ -28,7 +28,7 @@ class ReplayMemory:
     self.screens[self.current] = screen
     self.rewards[self.current] = reward
     self.dones[self.current] = done
-    self.count = min(self.memory_size, self.current + 1)
+    self.count = min(self.memory_size, self.count + 1)
     self.current = (self.current + 1) % self.memory_size
 
   def _state(self, index):
@@ -46,7 +46,7 @@ class ReplayMemory:
     while len(indexes) < self.batch_size:
       while True:
         index = random.randint(self.history_length, self.count - 1)
-        if self.current <= index or index - self.history_length + 1 <= self.current:
+        if self.current <= index and index - self.history_length + 1 <= self.current:
           continue
         if self.dones[(index - self.history_length):index].any():
           continue
@@ -54,10 +54,12 @@ class ReplayMemory:
       self.states[len(indexes), ...] = self._state(index - 1)
       self.next_states[len(indexes), ...] = self._state(index)
       indexes.append(index)
+    states = np.transpose(self.states, (0, 2, 3, 1))
     actions = self.actions[indexes]
     rewards = self.rewards[indexes]
+    next_states = np.transpose(self.next_states, (0, 2, 3, 1))
     dones = self.dones[indexes]
-    return self.states, actions, rewards, self.next_states, dones
+    return states, actions, rewards, next_states, dones
 
   def _store_counts(self):
     self.counts[0] = self.count
@@ -68,6 +70,7 @@ class ReplayMemory:
     self.current = self.counts[1]
 
   def save(self):
+    self._store_counts()
     for name, array in\
         zip(["actions", "rewards", "screens", "terminals", "counts"],
             [self.actions, self.rewards, self.screens, self.terminals, self.counts]):
@@ -78,6 +81,7 @@ class ReplayMemory:
         zip(["actions", "rewards", "screens", "terminals", "counts"],
             [self.actions, self.rewards, self.screens, self.terminals, self.counts]):
       array = load_npy(os.path.join(self.save_dir, name))
+    self._restore_counts()
 
 def save_npy(obj, path):
   np.save(path, obj)

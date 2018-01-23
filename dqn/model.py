@@ -37,6 +37,7 @@ class DQN(BaseModel):
     with tf.variable_scope("train"):
       self.S_in = tf.placeholder(tf.float32, (None, self.config.in_height, self.config.in_width, self.config.history_length), name="state")
       self.Q = self._q_net_cnn(self.S_in)
+      self.greedy_action = tf.argmax(self.Q, dimension=1)
     with tf.variable_scope("fixed"):
       self.fixed_S_in = tf.placeholder(tf.float32, (None, self.config.in_height, self.config.in_width, self.config.history_length), name="state")
       self.fixed_Q = self._q_net_cnn(self.fixed_S_in)
@@ -80,7 +81,7 @@ class DQN(BaseModel):
         name="fc{}".format(i + 1))
     Q = tf.layers.dense(
       inputs=h,
-      units=self.config.action_space_size,
+      units=self.env.action_space_size,
       kernel_initializer=initializer,
       name="Q")
     return Q
@@ -89,7 +90,7 @@ class DQN(BaseModel):
     with tf.variable_scope("optimizer"):
       self.A_in = tf.placeholder(tf.int32, (None,), name="action")
       self.target = tf.placeholder(tf.float32, (None,), name="target_q")
-      a_one_hot = tf.one_hot(self.A_in, self.config.action_space_size, 1., 0., name="one_hot")
+      a_one_hot = tf.one_hot(self.A_in, self.env.action_space_size, 1., 0., name="one_hot")
       Q_batch = tf.reduce_sum(tf.multiply(a_one_hot, self.Q), axis=1, name="q_batch")
       error = self.target - Q_batch
       loss = tf.reduce_mean(clipped_error(error), name="loss")
@@ -116,9 +117,10 @@ class DQN(BaseModel):
 
   def update_fixed_target(self):
     self.sess.run(self.copy_ops)
-    print("****fixed target updated")
+    print("\n****fixed target updated")
 
   def load(self):
     rt = self._load()
-    self.update_fixed_target()
+    if rt:
+      self.update_fixed_target()
     return rt

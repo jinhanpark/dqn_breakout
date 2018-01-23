@@ -10,9 +10,10 @@ def main():
   config = Config()
   env = Environment(config)
   agent = Agent(sess, config, env)
-  agent.train()
-  agent.save()
-  agent.summarize({})
+  if config.train:
+    agent.train()
+  else:
+    agent.play()
 
 
 if __name__=="__main__":
