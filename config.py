@@ -32,6 +32,9 @@ class TrainConfig:
   initial_exploration = 1.
   final_exploration = 0.1
   final_exploration_step = 100 * mahn
+
+  test_exploration = 0.05
+  test_play_num = 100
   
   replay_start_size = 5 * mahn
   fixed_net_update_frequency = mahn
