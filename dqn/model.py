@@ -52,9 +52,6 @@ class DQN(BaseModel):
     self.saver = tf.train.Saver()
     self.sess.run(tf.global_variables_initializer())
     print("****main graph builded")
-
-  def initialize_variables_and_copy_network(self):
-    self.sess.run(tf.global_variables_initializer())
     self.update_fixed_target()
 
   def _q_net_cnn(self, state_in):
