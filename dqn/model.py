@@ -49,7 +49,7 @@ class DQN(BaseModel):
     self.loss, self.train_op = self._loss_and_train_op()
     self.copy_ops = self._var_copy_ops()
     self.writer = tf.summary.FileWriter(self.config.log_dir, self.sess.graph)
-    self.saver = tf.train.Saver()
+    self.saver = tf.train.Saver(max_to_keep=10)
     self.sess.run(tf.global_variables_initializer())
     print("****main graph builded")
     self.update_fixed_target()
