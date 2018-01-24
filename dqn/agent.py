@@ -51,8 +51,6 @@ class Agent(DQN):
     print("\n****summarized")
 
   def train(self):
-    self.initialize_variables_and_copy_network()
-    
     self.make_directories()
     if self.config.load_ckpt:
       if self.load():
@@ -173,3 +171,29 @@ class Agent(DQN):
       if self.step % self.config.fixed_net_update_frequency == 0:
         self.update_fixed_target()
 
+  def play(self):
+    try:
+      self.load()
+    except:
+      print("****FAILED to load weights. Can't play anymore")
+      return None
+
+    screen, action, reward, done = self.env.initialize_game()
+
+    for _ in range(self.config.history_length):
+      self.short_term.add(screen)
+
+    ep_rewards = []
+
+    for i in range(self.config.test_play_num):
+      ep_reward = 0
+      while not done:
+        action = self.choose_action()
+        screen, reward, done = self.env.act(action)
+        reward = self.reward_clipping(reward)
+        ep_reward += reward
+      ep_rewards.append(ep_reward)
+      print("game #: {}, reward: {}".format(i + 1, ep_reward))
+
+    print("Evaluation Done.\n mean reward: {}, max reward: {}".format(np.mean(ep_rewards),
+                                                                      np.max(ep_rewards)))
