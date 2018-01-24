@@ -118,11 +118,11 @@ class DQN(BaseModel):
 
   def save(self, step):
     self._save(step)
-    #self.memory.save()
+    self.memory.save()
 
   def load(self):
     rt = self._load()
     if rt:
       self.update_fixed_target()
-      #self.memory.load()
+      self.memory.load()
     return rt
