@@ -81,9 +81,10 @@ class ReplayMemory:
 
   def load(self):
     for name, array in\
-        zip(["actions.npy", "rewards.npy", "screens.npy", "dones.npy", "counts.npy"],
+        zip(["actions", "rewards", "screens", "dones", "counts"],
             [self.actions, self.rewards, self.screens, self.dones, self.counts]):
-      array = load_npy(os.path.join(self.save_dir, name))
+      loaded = load_npy(os.path.join(self.save_dir, name + ".npy"))
+      np.copyto(array, loaded)
     self._restore_counts()
 
 def save_npy(obj, path):
