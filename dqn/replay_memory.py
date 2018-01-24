@@ -65,10 +65,8 @@ class ReplayMemory:
   def _store_counts(self):
     self.counts[0] = self.count
     self.counts[1] = self.current
-    print(self.counts)
 
   def _restore_counts(self):
-    print(self.counts)
     self.count = self.counts[0]
     self.current = self.counts[1]
 
