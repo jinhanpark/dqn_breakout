@@ -104,7 +104,7 @@ class DQN(BaseModel):
           self.config.lr_decay,
           staircase=True))
       train_op = tf.train.RMSPropOptimizer(
-        self.decayed_lr, momentum=0.95, epsilon=0.01).minimize(loss)
+        self.decayed_lr, decay=0.95, momentum=0.95, epsilon=0.01).minimize(loss)
     return loss, train_op
 
   def _var_copy_ops(self):
