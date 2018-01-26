@@ -60,7 +60,7 @@ class Agent(DQN):
     for _ in range(self.config.history_length):
       self.short_term.add(screen)
 
-    start_step = self.sess.run(self.global_step)
+    start_step = self.sess.run(self.global_step) + 1
     env_remake = False
     for self.step in tqdm(range(start_step, self.config.max_step), ncols=70, total=self.config.max_step, initial=start_step):
       if self.step == start_step or self.step == self.config.replay_start_size:
