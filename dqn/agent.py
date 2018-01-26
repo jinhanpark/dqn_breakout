@@ -125,7 +125,6 @@ class Agent(DQN):
           ep_rewards = []
           self.total_loss = 0.
           self.total_q = 0.
-        
 
   def get_eps(self):
     if self.config.train:
