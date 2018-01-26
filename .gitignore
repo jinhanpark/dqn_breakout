@@ -198,6 +198,7 @@ tags
 # End of https://www.gitignore.io/api/vim,linux,emacs,python
 
 #tensorflow ckpt & logs
+save/
 tensorboard/
 ckpt/
 log/
