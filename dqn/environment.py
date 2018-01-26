@@ -85,8 +85,3 @@ class Environment:
     self.reward = 0
     self.done = True
     self.info = None
-
-  def remake(self):
-    self.env.close()
-    self.make()
-    print("\n****gym environment closed and remade")

@@ -61,7 +61,6 @@ class Agent(DQN):
       self.short_term.add(screen)
 
     start_step = self.sess.run(self.global_step) + 1
-    env_remake = False
     for self.step in tqdm(range(start_step, self.config.max_step), ncols=70, total=self.config.max_step, initial=start_step):
       if self.step == start_step or self.step == self.config.replay_start_size:
         self.update_cnt = 0
@@ -76,13 +75,7 @@ class Agent(DQN):
       screen, reward, done = self.env.act(action)
       self.after_act(action, screen, reward, done)
 
-      if self.step % self.config.final_exploration_step == 0:
-        env_remake = True
-
       if done:
-        if env_remake:
-          self.env.remake()
-          env_remake = False
         screen, action, reward, done = self.env.start_randomly()
         ep_rewards.append(ep_reward)
         ep_reward = 0.
