@@ -1,8 +1,8 @@
 mahn = 10000
 
 class MemoryConfig:
-  mem_dir = "memory/"
-  memory_size = 10 * mahn
+  mem_dir = "save/memory/"
+  memory_size = 50 * mahn
 
 class ModelConfig:
   model_name = "DQN"
@@ -17,17 +17,18 @@ class ModelConfig:
                (64, 3, 1)]
   fc_archi = [512]
 
-  log_dir = "tensorboard/"
-  ckpt_dir = "ckpt/"
+  log_dir = "save/tensorboard/"
+  ckpt_dir = "save/ckpt/"
 
 class EnvironmentConfig:
-  env_name = "BreakoutDeterministic-v4"
+  #env_name = "BreakoutDeterministic-v4"
+  env_name = "Breakout-v0"
 
   max_reward = 1.
   min_reward = -1.
 
 class TrainConfig:
-  max_step = 500 * mahn
+  max_step = 5000 * mahn
 
   initial_exploration = 1.
   final_exploration = 0.1
@@ -56,6 +57,6 @@ class TrainConfig:
   load_model = True
   
 class Config(MemoryConfig, ModelConfig, EnvironmentConfig, TrainConfig):
-  load_ckpt = True
-  train = True
+  load_ckpt = 1
+  train = 1
   render = 0

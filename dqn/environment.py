@@ -8,18 +8,14 @@ import random
 
 class Environment:
   def __init__(self, config):
-    self.env = gym.make(config.env_name)
+    self.env_name = config.env_name
+    self.make()
 
     self.action_repeat= config.action_repeat
     self.no_op_max = config.no_op_max
     self.rendering = config.render
     self.in_shape = (config.in_height, config.in_width)
 
-    self._screen = None
-    self.reward = 0
-    self.done = True
-    self.info = None
-    
   def initialize_game(self):
     if self.lives == 0:
       self._screen = self.env.reset()
@@ -82,3 +78,15 @@ class Environment:
 
     self.after_act(action)
     return self.screen, self.reward, self.done
+
+  def make(self):
+    self.env = gym.make(self.env_name)
+    self._screen = None
+    self.reward = 0
+    self.done = True
+    self.info = None
+
+  def remake(self):
+    self.env.close()
+    self.make()
+    print("\n****gym environment closed and remade")

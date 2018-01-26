@@ -11,8 +11,7 @@ class BaseModel:
 
   def _save(self, step=None):
     model_name = self.config.model_name
-    ckpt_dir = os.path.join(self.config.ckpt_dir, model_name)
-    self.saver.save(self.sess, ckpt_dir, global_step=step)
+    self.saver.save(self.sess, self.config.ckpt_dir, global_step=step)
     print("****weights saved")
 
   def _load(self):
@@ -118,11 +117,18 @@ class DQN(BaseModel):
 
   def save(self, step):
     self._save(step)
-    self.memory.save()
+    if self.config.train:
+      self.memory.save()
 
   def load(self):
     rt = self._load()
     if rt:
       self.update_fixed_target()
-      self.memory.load()
+      if self.config.train:
+        try:
+          self.memory.load()
+        except:
+          print("****FAILED to load memory")
+    else:
+      print("****FAILED to load checkpoint and memory")
     return rt

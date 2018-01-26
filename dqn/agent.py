@@ -53,13 +53,7 @@ class Agent(DQN):
   def train(self):
     self.make_directories()
     if self.config.load_ckpt:
-      if self.load():
-        try:
-          self.memory.load()
-        except:
-          print("****FAILED to load memory")
-      else:
-        print("****FAILED to load checkpoint and memory")
+      self.load()
 
     screen, action, reward, done = self.env.start_randomly()
 
@@ -67,8 +61,8 @@ class Agent(DQN):
       self.short_term.add(screen)
 
     start_step = self.sess.run(self.global_step)
-
-    for self.step in tqdm(range(start_step, self.config.max_step), ncols=70):
+    env_remake = False
+    for self.step in tqdm(range(start_step, self.config.max_step), ncols=70, total=self.config.max_step, initial=start_step):
       if self.step == start_step or self.step == self.config.replay_start_size:
         self.update_cnt = 0
         ep_reward = 0.
@@ -82,7 +76,13 @@ class Agent(DQN):
       screen, reward, done = self.env.act(action)
       self.after_act(action, screen, reward, done)
 
+      if self.step % self.config.final_exploration_step == 0:
+        env_remake = True
+
       if done:
+        if env_remake:
+          self.env.remake()
+          env_remake = False
         screen, action, reward, done = self.env.start_randomly()
         ep_rewards.append(ep_reward)
         ep_reward = 0.
@@ -107,7 +107,7 @@ class Agent(DQN):
           print("\navg_r: {:.4f}, avg_l: {:.6f}, avg_q: {:3.6f}, avg_ep_r: {:.4f}, max_ep_r: {:.4f}".format(avg_reward, avg_loss, avg_q, avg_ep_reward, max_ep_reward))
 
           if max_avg_record * 0.9 <= avg_ep_reward:
-            self.global_step.assign(self.step + 1)
+            self.sess.run(self.global_step.assign(self.step))
             self.save(self.step)
             max_avg_record = max(max_avg_record, avg_ep_reward)
 
@@ -123,13 +123,15 @@ class Agent(DQN):
           ep_reward = 0.
           total_reward = 0.
           ep_rewards = []
-          max_avg_record = 0.
           self.total_loss = 0.
           self.total_q = 0.
         
 
   def get_eps(self):
-    return 1 - 0.9 * ((self.step - self.config.replay_start_size) / (self.config.final_exploration_step - self.config.replay_start_size))
+    if self.config.train:
+      return 1 - 0.9 * ((self.step - self.config.replay_start_size) / (self.config.final_exploration_step - self.config.replay_start_size))
+    else:
+      return self.config.test_exploration
 
   def choose_action(self):
     eps = self.get_eps()
@@ -190,10 +192,12 @@ class Agent(DQN):
       while not done:
         action = self.choose_action()
         screen, reward, done = self.env.act(action)
+        self.short_term.add(screen)
         reward = self.reward_clipping(reward)
         ep_reward += reward
       ep_rewards.append(ep_reward)
       print("game #: {}, reward: {}".format(i + 1, ep_reward))
+      screen, action, reward, done = self.env.initialize_game()
 
     print("Evaluation Done.\n mean reward: {}, max reward: {}".format(np.mean(ep_rewards),
                                                                       np.max(ep_rewards)))

@@ -47,7 +47,7 @@ class ReplayMemory:
     while len(indexes) < self.batch_size:
       while True:
         index = random.randint(self.history_length, self.count - 1)
-        if self.current <= index and index - self.history_length + 1 <= self.current:
+        if self.current <= index and index <= (self.current + self.history_length - 1):
           continue
         if self.dones[(index - self.history_length - 1):(index - 1)].any():
           continue
