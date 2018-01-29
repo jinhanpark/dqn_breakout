@@ -120,11 +120,15 @@ class Agent(DQN):
           self.total_q = 0.
 
   def get_eps(self):
-    if self.config.train:
+    if not self.config.train:
+      return self.config.test_exploration
+    elif self.step < self.replay_start_size:
+      return 1
+    elif self.step < self.config.final_exploration_step:
       return 1 - 0.9 * ((self.step - self.config.replay_start_size) / (self.config.final_exploration_step - self.config.replay_start_size))
     else:
-      return self.config.test_exploration
-
+      return self.config.final_exploration
+      
   def choose_action(self):
     eps = self.get_eps()
     if random.random() < eps:
