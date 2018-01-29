@@ -21,8 +21,8 @@ class ModelConfig:
   ckpt_dir = "save/ckpt/"
 
 class EnvironmentConfig:
-  env_name = "BreakoutDeterministic-v4"
-  # env_name = "Breakout-v0"
+  # env_name = "BreakoutDeterministic-v4"
+  env_name = "Breakout-v0"
 
   max_reward = 1.
   min_reward = -1.
