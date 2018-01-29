@@ -71,6 +71,7 @@ class ReplayMemory:
     self.current = self.counts[1]
 
   def save(self):
+    print("\n****saving replay memory")
     self._store_counts()
     for name, array in\
         zip(["screens", "actions", "rewards", "dones", "counts"],
@@ -78,6 +79,7 @@ class ReplayMemory:
       save_npy(array, os.path.join(self.save_dir, name))
 
   def load(self):
+    print("\n****loading replay memory")
     for name, array in\
         zip(["screens", "actions", "rewards", "dones", "counts"],
             [self.screens, self.actions, self.rewards, self.dones, self.counts]):
