@@ -122,8 +122,8 @@ class Agent(DQN):
   def get_eps(self):
     if not self.config.train:
       return self.config.test_exploration
-    elif self.step < self.replay_start_size:
-      return 1
+    elif self.step < self.config.replay_start_size:
+      return 1.
     elif self.step < self.config.final_exploration_step:
       return 1 - 0.9 * ((self.step - self.config.replay_start_size) / (self.config.final_exploration_step - self.config.replay_start_size))
     else:
