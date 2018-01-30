@@ -25,7 +25,7 @@ class Environment:
 
   def start_randomly(self):
     self.initialize_game()
-    for _ in range(random.randint(1, self.no_op_max)):
+    for _ in range(random.randint(0, self.no_op_max)):
       self._step(0)
     self.render()
     return self.screen, 0, 0, self.done
