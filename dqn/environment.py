@@ -56,10 +56,10 @@ class Environment:
     if self.rendering:
       self.env.render()
 
-  def after_act(self, action):
+  def after_act(self):
     self.render()
 
-  def act(self, action):
+  def repeat_action(self, action):
     action_reward = 0
     before_lives = self.lives
 
@@ -78,6 +78,17 @@ class Environment:
 
     self.after_act(action)
     return self.screen, self.reward, self.done
+
+  def single_action(self, action):
+    self._step(action)
+    self.after_act()
+    return self.screen, self.reward, self.done
+
+  def act(self, action):
+    if self.action_repeat > 1:
+      return self.repeat_action(action)
+    else:
+      return self.single_action(action)
 
   def make(self):
     self.env = gym.make(self.env_name)
