@@ -41,7 +41,7 @@ class TrainConfig:
   fixed_net_update_frequency = mahn
 
   replay_frequency = 4
-  action_repeat = 4
+  action_repeat = 1
 
   no_op_max = 30
   
