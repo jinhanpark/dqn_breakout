@@ -10,7 +10,9 @@ def main():
   config = Config()
   env = Environment(config)
   agent = Agent(sess, config, env)
-  if config.train:
+  if config.test:
+    agent.play(test=True)
+  elif config.train:
     agent.train()
   else:
     agent.play()

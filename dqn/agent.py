@@ -169,7 +169,7 @@ class Agent(DQN):
       if self.step % self.config.fixed_net_update_frequency == 0:
         self.update_fixed_target()
 
-  def play(self):
+  def play(self, test=False):
     try:
       self.load()
     except:
@@ -186,7 +186,10 @@ class Agent(DQN):
     for i in range(self.config.test_play_num):
       ep_reward = 0
       while not done:
-        action = self.choose_action()
+        if test:
+          action = int(input("Enter the action (0 ~ {}): ".format(self.env.action_space_size - 1)))
+        else:
+          action = self.choose_action()
         screen, reward, done = self.env.act(action)
         self.short_term.add(screen)
         ep_reward += reward

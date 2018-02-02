@@ -125,7 +125,7 @@ class DQN(BaseModel):
     rt = self._load()
     if rt:
       self.update_fixed_target()
-      if self.config.train:
+      if not self.config.test and self.config.train:
         try:
           self.memory.load()
         except:
