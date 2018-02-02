@@ -189,7 +189,6 @@ class Agent(DQN):
         action = self.choose_action()
         screen, reward, done = self.env.act(action)
         self.short_term.add(screen)
-        reward = self.reward_clipping(reward)
         ep_reward += reward
       ep_rewards.append(ep_reward)
       print("game #: {}, reward: {}".format(i + 1, ep_reward))
