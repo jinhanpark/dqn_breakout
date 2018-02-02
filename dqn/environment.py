@@ -76,7 +76,7 @@ class Environment:
 
     self.reward = action_reward
 
-    self.after_act(action)
+    self.after_act()
     return self.screen, self.reward, self.done
 
   def make(self):
