@@ -3,6 +3,8 @@ import tensorflow as tf
 
 import random
 
+import time
+
 from .model import DQN
 from .replay_memory import ReplayMemory
 from .short_term_memory import ShortTermMemory
@@ -191,6 +193,7 @@ class Agent(DQN):
         else:
           action = self.choose_action()
         screen, reward, done = self.env.act(action)
+        time.sleep(1/240)
         self.short_term.add(screen)
         ep_reward += reward
       ep_rewards.append(ep_reward)
