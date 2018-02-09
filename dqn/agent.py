@@ -50,6 +50,7 @@ class Agent(DQN):
       {self.summary_placeholders[tag]: value for tag, value in tag_dict.items()})
     for elt in summary_lst:
       self.writer.add_summary(elt, step)
+    self.writer.flush()
     print("\n****summarized")
 
   def train(self):
