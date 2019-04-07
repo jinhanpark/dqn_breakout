@@ -61,7 +61,7 @@ class DQN(BaseModel):
                                             self.sess.graph)
         self.saver = tf.train.Saver(max_to_keep=10)
         self.sess.run(tf.global_variables_initializer())
-        print("****main graph builded")
+        print("****main graph buildt")
         self.update_fixed_target()
 
     def _q_net_cnn(self, state_in):
